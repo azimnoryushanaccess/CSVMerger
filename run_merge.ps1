@@ -198,11 +198,11 @@ try {
 
                 #Beneficiary Bank Section
                 $BeneficiaryBankAddr = $row_b[7]
-                $BeneficiaryBankCountryCode = $row_b[8].Substring($row_b[8].Length - 2) # Get last 2 chars
+                $BeneficiaryBankCountryCode = if (-not [string]::IsNullOrEmpty($row_b[8])) { $row_b[8].Substring($row_b[8].Length - 2) } else { $row_b[8] } # Get last 2 chars
 
                 $ExcelWorkSheet_Output.Cells.Item($outputRow, 27).Value2 = $BeneficiaryBankAddr
                 $ExcelWorkSheet_Output.Cells.Item($outputRow, 30).Value2 = $BeneficiaryBankCountryCode
-                
+
                 #Intermediary Bank Section
                 $SwiftID = $row_b[10]
                 $IntermediaryBankName = $row_b[11]
@@ -213,7 +213,7 @@ try {
                 
                 #Address Section
                 $AddressCellValue = $row_b[12] #240 GREENWICH STREET, Address 2, NEW YORK,NY
-                $IntermediaryBankCountryCode = $row_b[13].Substring($row_b[13].Length - 2) # Get last 2 chars
+                $IntermediaryBankCountryCode = if (-not [string]::IsNullOrEmpty($row_b[13])) { $row_b[13].Substring($row_b[13].Length - 2) } else { $row_b[13] } # Get last 2 chars
 
                 function Split-Address {
                     param (
