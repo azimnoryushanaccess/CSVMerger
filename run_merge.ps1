@@ -189,6 +189,11 @@ try {
                     $ExcelWorkSheet_Output.Cells.Item($outputRow, $col + 1).Value2 = $cellValue
                 }
 
+                # Hardcode some information
+                $ExcelWorkSheet_Output.Cells.Item($outputRow, 3).Value2 = "CHASHKHH"
+                $ExcelWorkSheet_Output.Cells.Item($outputRow, 6).Value2 = "USD"
+                $ExcelWorkSheet_Output.Cells.Item($outputRow, 14).Value2 = "ACCT"
+
                 # Clear Beneficiary Details
                 $ExcelWorkSheet_Output.Cells.Item($outputRow, 17).Value2 = ""
                 $ExcelWorkSheet_Output.Cells.Item($outputRow, 18).Value2 = ""
