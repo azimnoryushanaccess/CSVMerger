@@ -307,7 +307,7 @@ try {
                 $ExcelWorkSheet_Output.Cells.Item($outputRow, 80).Value2 = ""
 
                 #Bank to Bank Detail Section
-                $BankToBankLines = $row_b[16] -split "`n"
+                $BankToBankLines = if (-not [string]::IsNullOrEmpty($row_b[16])) { $row_b[16] -split "`n" } else { $row_b[16] }
                 $startColumn = 100
 
                 foreach ($line in $BankToBankLines) {
