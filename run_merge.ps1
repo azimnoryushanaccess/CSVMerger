@@ -346,8 +346,8 @@ try {
                     }
                     else {
                         Write-Host "No match for line '$line'"
-                        $ExcelWorkSheet_Output.Cells.Item($outputRow, $startColumn).Value2 = $line
-                        $ExcelWorkSheet_Output.Cells.Item($outputRow, $startColumn + 1).Value2 = ""
+                        $ExcelWorkSheet_Output.Cells.Item($outputRow, $startColumn + 1).Value2 = $line
+                        # $ExcelWorkSheet_Output.Cells.Item($outputRow, $startColumn + 1).Value2 = ""
                     }
                     $startColumn += 2
                 }
@@ -355,8 +355,8 @@ try {
                 #Charges
                 # $ExcelWorkSheet_Output.Cells.Item($outputRow, 114).Value2 = $row_b[17]
 
-                $ExcelWorkSheet_Output.Cells.Item($outputRow, 106).Value2 = ""
-                $ExcelWorkSheet_Output.Cells.Item($outputRow, 107).Value2 = "ABA ROUTING NO: 021000018"
+                # $ExcelWorkSheet_Output.Cells.Item($outputRow, 106).Value2 = ""
+                # $ExcelWorkSheet_Output.Cells.Item($outputRow, 107).Value2 = "ABA ROUTING NO: 021000018"
 
                 #Additional Info
                 if (-not [string]::IsNullOrEmpty($row_b[4])) {
