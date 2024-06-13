@@ -203,9 +203,36 @@ try {
 
                 #Beneficiary Bank Section
                 $BeneficiaryBankAddr = $row_b[7]
+                $BeneficiaryBankAddr3 = ""
+
+                if (-not [string]::IsNullOrEmpty($BeneficiaryBankAddr)) {
+                    # Check if the length of the BeneficiaryBankAddr is more than 35
+                    if ($BeneficiaryBankAddr.Length -gt 35) {
+                        # Split the string by commas
+                        $splitAddr = $BeneficiaryBankAddr -split ","
+        
+                        # Check if the last value is numeric
+                        if ($splitAddr[-1].Trim() -match '^\d+$') {
+                            # Get the last two values from the split array
+                            $BeneficiaryBankAddr3 = ($splitAddr[-2..-1] -join ",").Trim()
+            
+                            # Remove the last two values and join the remaining parts back into a string
+                            $BeneficiaryBankAddr = ($splitAddr[0..($splitAddr.Length - 3)] -join ",").Trim()
+                        }
+                        else {
+                            # Get the last value from the split array
+                            $BeneficiaryBankAddr3 = $splitAddr[-1].Trim()
+            
+                            # Remove the last value and join the remaining parts back into a string
+                            $BeneficiaryBankAddr = ($splitAddr[0..($splitAddr.Length - 2)] -join ",").Trim()
+                        }
+                    }
+                }
+
                 $BeneficiaryBankCountryCode = if (-not [string]::IsNullOrEmpty($row_b[8])) { $row_b[8].Substring($row_b[8].Length - 2) } else { $row_b[8] } # Get last 2 chars
 
                 $ExcelWorkSheet_Output.Cells.Item($outputRow, 27).Value2 = $BeneficiaryBankAddr
+                $ExcelWorkSheet_Output.Cells.Item($outputRow, 29).Value2 = $BeneficiaryBankAddr3
                 $ExcelWorkSheet_Output.Cells.Item($outputRow, 30).Value2 = $BeneficiaryBankCountryCode
 
                 #Intermediary Bank Section
@@ -294,7 +321,6 @@ try {
 
                 # Not needed remove this part
                 # $ExcelWorkSheet_Output.Cells.Item($outputRow, 47).Value2 = "USABA"
-                # $ExcelWorkSheet_Output.Cells.Item($outputRow, 48).Value2 = "021000018"
 
                 #Internal ref
                 $InternalRef = $row_b[15]
@@ -329,8 +355,16 @@ try {
                 #Charges
                 # $ExcelWorkSheet_Output.Cells.Item($outputRow, 114).Value2 = $row_b[17]
 
+                $ExcelWorkSheet_Output.Cells.Item($outputRow, 106).Value2 = ""
+                $ExcelWorkSheet_Output.Cells.Item($outputRow, 107).Value2 = "ABA ROUTING NO: 021000018"
+
                 #Additional Info
-                $ExcelWorkSheet_Output.Cells.Item($outputRow, 116).Value2 = $row_b[4]
+                if (-not [string]::IsNullOrEmpty($row_b[4])) {
+                    $ExcelWorkSheet_Output.Cells.Item($outputRow, 116).Value2 = "PurposeOfPaymentDestination=P1014" #$row_b[4]
+                }
+                else {
+                    $ExcelWorkSheet_Output.Cells.Item($outputRow, 116).Value2 = ""
+                }
 
                 # Move to the next row in the output worksheet
                 $outputRow++
