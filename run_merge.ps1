@@ -99,7 +99,7 @@ try {
                     $row.21 = ""
 
                     #Beneficiary Bank Section
-                    $BeneficiaryBankAddr = $row_data[7]
+                    $BeneficiaryBankAddr = $row_data[7] -replace "`r`n", "," -replace "`n", "," -replace "`r", ","
                     $BeneficiaryBankAddr3 = ""
 
                     if (-not [string]::IsNullOrEmpty($BeneficiaryBankAddr)) {
@@ -107,22 +107,12 @@ try {
                         if ($BeneficiaryBankAddr.Length -gt 35) {
                             # Split the string by commas
                             $splitAddr = $BeneficiaryBankAddr -split ","
+
+                            # Get the last two values from the split array
+                            $BeneficiaryBankAddr3 = ($splitAddr[-2..-1] -join ",").Trim()
             
-                            # Check if the last value is numeric
-                            if ($splitAddr[-1].Trim() -match '^\d+$') {
-                                # Get the last two values from the split array
-                                $BeneficiaryBankAddr3 = ($splitAddr[-2..-1] -join ",").Trim()
-                
-                                # Remove the last two values and join the remaining parts back into a string
-                                $BeneficiaryBankAddr = ($splitAddr[0..($splitAddr.Length - 3)] -join ",").Trim()
-                            }
-                            else {
-                                # Get the last value from the split array
-                                $BeneficiaryBankAddr3 = $splitAddr[-1].Trim()
-                
-                                # Remove the last value and join the remaining parts back into a string
-                                $BeneficiaryBankAddr = ($splitAddr[0..($splitAddr.Length - 2)] -join ",").Trim()
-                            }
+                            # Remove the last two values and join the remaining parts back into a string
+                            $BeneficiaryBankAddr = ($splitAddr[0..($splitAddr.Length - 3)] -join ",").Trim()
                         }
                     }
 
@@ -134,14 +124,15 @@ try {
                     
                     #Intermediary Bank Section
                     $SwiftID = $row_data[10]
-                    $IntermediaryBankName = $row_data[11]
+                    $IntermediaryBankName = $row_data[11] -replace "`r`n", " " -replace "`n", " " -replace "`r", " "
 
                     $row.40 = "SWIFT"
                     $row.41 = $SwiftID
                     $row.42 = $IntermediaryBankName
 
                     #Address Section
-                    $AddressCellValue = $row_data[12] #240 GREENWICH STREET, Address 2, NEW YORK,NY
+                    $AddressCellValue = $row_data[12] -replace "`r`n", "," -replace "`n", "," -replace "`r", "," #240 GREENWICH STREET, Address 2, NEW YORK,NY
+                    $Address3 = ""
                     $IntermediaryBankCountryCode = if (-not [string]::IsNullOrEmpty($row_data[13])) { $row_data[13].Substring($row_data[13].Length - 2) } else { $row_data[13] } # Get last 2 chars
 
                     function Split-Address {
@@ -206,14 +197,28 @@ try {
 
                     $AddressSplitResult = Split-Address -address $AddressCellValue
 
+                    if (-not [string]::IsNullOrEmpty($AddressCellValue)) {
+                        # Check if the length of the AddressCellValue is more than 35
+                        if ($AddressCellValue.Length -gt 35) {
+                            # Split the string by commas
+                            $splitIAddr = $AddressCellValue -split ","
+
+                            # Get the last two values from the split array
+                            $Address3 = ($splitIAddr[-2..-1] -join ",").Trim()
+            
+                            # Remove the last two values and join the remaining parts back into a string
+                            $AddressCellValue = ($splitIAddr[0..($splitIAddr.Length - 3)] -join ",").Trim()
+                        }
+                    }
+
                     # Split the value on the comma
                     $Address1 = $AddressSplitResult.Address1
                     $Address2 = $AddressSplitResult.Address2
-                    $Address3 = $AddressSplitResult.Address3
+                    # $Address3 = $AddressSplitResult.Address3
 
                     $row.43 = $AddressCellValue
                     $row.44 = ""
-                    $row.45 = ""
+                    $row.45 = $Address3
                     $row.46 = $IntermediaryBankCountryCode
 
                     #Internal ref
