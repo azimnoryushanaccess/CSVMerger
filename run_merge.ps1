@@ -103,16 +103,33 @@ try {
                     $BeneficiaryBankAddr3 = ""
 
                     if (-not [string]::IsNullOrEmpty($BeneficiaryBankAddr)) {
+
+                        # Remove IFSC Code from Beneficiary bank address
+                        if ($BeneficiaryBankAddr -match "IFSC CODE:\s*(\w+),\s*(.*)") {
+                            $BeneficiaryBankAddr = $matches[2]
+                        }
+
                         # Check if the length of the BeneficiaryBankAddr is more than 35
                         if ($BeneficiaryBankAddr.Length -gt 35) {
                             # Split the string by commas
                             $splitAddr = $BeneficiaryBankAddr -split ","
 
-                            # Get the last two values from the split array
-                            $BeneficiaryBankAddr3 = ($splitAddr[-2..-1] -join ",").Trim()
+                            # Check if there are more than two splits
+                            if ($splitAddr.Length -gt 2) {
+                                # Get the last two values from the split array
+                                $BeneficiaryBankAddr3 = ($splitAddr[-2..-1] -join ",").Trim()
             
-                            # Remove the last two values and join the remaining parts back into a string
-                            $BeneficiaryBankAddr = ($splitAddr[0..($splitAddr.Length - 3)] -join ",").Trim()
+                                # Remove the last two values and join the remaining parts back into a string
+                                $BeneficiaryBankAddr = ($splitAddr[0..($splitAddr.Length - 3)] -join ",").Trim()    
+                            }
+                            else {
+                                # Get the last values from the split array
+                                $BeneficiaryBankAddr3 = $splitAddr[-1].Trim()
+            
+                                # Remove the last two values and join the remaining parts back into a string
+                                $BeneficiaryBankAddr = $splitAddr[0].Trim()
+                            }
+                            
                         }
                     }
 
@@ -203,11 +220,19 @@ try {
                             # Split the string by commas
                             $splitIAddr = $AddressCellValue -split ","
 
-                            # Get the last two values from the split array
-                            $Address3 = ($splitIAddr[-2..-1] -join ",").Trim()
+                            # Check if there are more than two splits
+                            if ($splitIAddr.Length -gt 2) {
+                                # Get the last two values from the split array
+                                $Address3 = ($splitIAddr[-2..-1] -join ",").Trim()
             
-                            # Remove the last two values and join the remaining parts back into a string
-                            $AddressCellValue = ($splitIAddr[0..($splitIAddr.Length - 3)] -join ",").Trim()
+                                # Remove the last two values and join the remaining parts back into a string
+                                $AddressCellValue = ($splitIAddr[0..($splitIAddr.Length - 3)] -join ",").Trim()
+                            }
+                            else {
+                                $Address3 = $splitIAddr[-1].Trim()
+                                $AddressCellValue = $splitIAddr[0].Trim()
+                            }
+                            
                         }
                     }
 
@@ -246,7 +271,7 @@ try {
                     $startColumn = 100
 
                     foreach ($line in $BankToBankLines) {
-                        if ($line -match "^(ACC:|IFSC CODE|FND|INT:)\s*(.*)") {
+                        if ($line -match "^(ACC |IFSC CODE|FND|INT:)\s*(.*)") {
                             $code = $matches[1].TrimEnd(' :')
                             $details = $matches[2]
                             Write-Host "Copying code '$code' and details '$details' to rows $startColumn and $($startColumn + 1) in output worksheet"
