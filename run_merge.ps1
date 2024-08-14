@@ -250,30 +250,76 @@ try {
                     $InternalRef = $row_data[15]
                     $row.75 = $InternalRef
 
-                    #Transaction Detail Section
+                    # Transaction Detail Section
                     $transDetail = ""
                     if (-not [string]::IsNullOrEmpty($row_data[14])) {
-                        # Split the string by newline characters and get the first line
-                        $firstLine = $row_data[14] -split '\r?\n' | Select-Object -First 1
-                        # Set $row.77 with the first line
-                        $transDetail = $firstLine
+                        # Remove any newline characters and replace with space
+                        $transDetail = $row_data[14] -replace '\r\n', ' ' -replace '\n', ' '
+
+                        # Initialize an array to hold the split parts
+                        $splitParts = @()
+
+                        while ($transDetail.Length -gt 35) {
+                            # Find the last space within the first 35 characters
+                            $splitIndex = $transDetail.Substring(0, 35).LastIndexOf(' ')
+        
+                            # If no space found, split at the 35th character
+                            if ($splitIndex -eq -1) {
+                                $splitIndex = 35
+                            }
+
+                            # Add the part to the array and trim it from the original string
+                            $splitParts += $transDetail.Substring(0, $splitIndex).Trim()
+                            $transDetail = $transDetail.Substring($splitIndex).Trim()
+                        }
+
+                        # Add any remaining part
+                        $splitParts += $transDetail
+
+                        # Assign the split parts to $row.77 to $row.80
+                        $row.77 = $splitParts[0]
+
+                        if ($splitParts.Count -ge 2) {
+                            $row.78 = $splitParts[1]
+                        }
+                        else {
+                            $row.78 = ""
+                        }
+
+                        if ($splitParts.Count -ge 3) {
+                            $row.79 = $splitParts[2]
+                        }
+                        else {
+                            $row.79 = ""
+                        }
+
+                        if ($splitParts.Count -ge 4) {
+                            $row.80 = $splitParts[3]
+                        }
+                        else {
+                            $row.80 = ""
+                        }
                     }
                     else {
-                        $transDetail = $row_data[14]
+                        $row.77 = ""
+                        $row.78 = ""
+                        $row.79 = ""
+                        $row.80 = ""
                     }
-                    $row.77 = $transDetail
-                    $row.78 = ""
-                    $row.79 = ""
-                    $row.80 = ""
 
                     #Bank to Bank Detail Section
                     $BankToBankLines = if (-not [string]::IsNullOrEmpty($row_data[16])) { $row_data[16] -split "`n" } else { $row_data[16] }
                     $startColumn = 100
 
                     foreach ($line in $BankToBankLines) {
-                        if ($line -match "^(ACC |IFSC CODE|FND|INT:)\s*(.*)") {
+                        if ($line -match "^(ACC |IFSC CODE|FND|INT )\s*(.*)") {
                             $code = $matches[1].TrimEnd(' :')
-                            $details = $matches[2]
+                            if (-not [string]::IsNullOrEmpty($details)) {
+                                $details = $matches[2].Trim()
+                            }
+                            else {
+                                $details = $matches[2]
+                            }
                             Write-Host "Copying code '$code' and details '$details' to rows $startColumn and $($startColumn + 1) in output worksheet"
                             $row.$startColumn = $code
                             $row.($startColumn + 1) = $details
