@@ -50,7 +50,7 @@ try {
     $wirebank_data = @()
     for ($j = 1; $j -le $wirebank_rowCount; $j++) {
         $row = @()
-        for ($col = 3; $col -le 20; $col++) {
+        for ($col = 3; $col -le 21; $col++) {
             $row += $ExcelWorkSheet.Cells.Item($j, $col).Value2
         }
         $wirebank_data += , $row
@@ -84,13 +84,17 @@ try {
                 $wirebankacc_value = $row_data[1]
 
                 if (-not [string]::IsNullOrWhiteSpace($wirebankacc_value) -and $row.15 -eq $wirebankacc_value.ToString()) {
+
+                    $currency = $row_data[18]
+                    
                     $row.3 = "CHASHKHH"
-                    if ($row.15 -eq "GB74LOYD30166332775601") {
-                        $row.6 = "GBP"
-                    } 
-                    else {
-                        $row.6 = "USD"
-                    }
+                    # if ($row.15 -eq "GB74LOYD30166332775601") {
+                    #     $row.6 = "GBP"
+                    # } 
+                    # else {
+                    #     $row.6 = "USD"
+                    # }
+                    $row.6 = $currency
                     $row.14 = "ACCT"
                     $row.17 = ""
                     $row.18 = ""
@@ -134,7 +138,7 @@ try {
                     }
 
                     $BeneficiaryBankCountryCode = if (-not [string]::IsNullOrEmpty($row_data[8])) { $row_data[8].Substring($row_data[8].Length - 2) } else { $row_data[8] } # Get last 2 chars
-
+                    $row.25 = $row_data[5] # B.Bank Code
                     $row.27 = $BeneficiaryBankAddr
                     $row.29 = $BeneficiaryBankAddr3
                     $row.30 = $BeneficiaryBankCountryCode
@@ -318,7 +322,7 @@ try {
                                 $details = $matches[2].Trim()
                             }
                             else {
-                                $details = $matches[2]
+                                $details = $matches[2].Trim()
                             }
                             Write-Host "Copying code '$code' and details '$details' to rows $startColumn and $($startColumn + 1) in output worksheet"
                             $row.$startColumn = $code
@@ -326,7 +330,7 @@ try {
                         }
                         else {
                             Write-Host "No match for line '$line'"
-                            $row.($startColumn + 1) = $line
+                            $row.($startColumn + 1) = $line.Trim()
                             # $ExcelWorkSheet_Output.Cells.Item($outputRow, $startColumn + 1).Value2 = ""
                         }
                         $startColumn += 2
