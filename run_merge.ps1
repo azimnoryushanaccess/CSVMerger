@@ -138,7 +138,7 @@ try {
                     }
 
                     $BeneficiaryBankCountryCode = if (-not [string]::IsNullOrEmpty($row_data[8])) { $row_data[8].Substring($row_data[8].Length - 2) } else { $row_data[8] } # Get last 2 chars
-                    $row.25 = $row_data[5] # B.Bank Code
+                    $row.25 = if ($row_data[5]) { $row_data[5].Trim() } else { $row_data[5] } # B.Bank Code?
                     $row.27 = $BeneficiaryBankAddr
                     $row.29 = $BeneficiaryBankAddr3
                     $row.30 = $BeneficiaryBankCountryCode
