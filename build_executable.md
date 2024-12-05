@@ -1,0 +1,1 @@
+Invoke-ps2exe .\run_merge.ps1 -company "The Access Group" -version "1.0.14"
